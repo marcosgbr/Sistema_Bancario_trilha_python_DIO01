@@ -72,11 +72,12 @@ def realizar_saque(saldo, extrato, numero_saques):
     return saldo, extrato, numero_saques
 
 def exibir_extrato (saldo, extrato):
-    print("\n===========EXTRATO============")
+    print("\n===============EXTRATO===============")
     print("Não foram realizadas movimentações" if not extrato else extrato)
     print(f"\nSaldo: R$ {saldo:.2f}")
-    print("================================")
+    print("=======================================")
     
+    return (" ")
 while True:
     exibir_menu()
     opcao = input("Escolha uma opção: ")
@@ -88,8 +89,8 @@ while True:
         saldo, extrato, numero_saques = realizar_saque(saldo, extrato, numero_saques)
             
     elif opcao == "3":
-        saldo, extrato = exibir_extrato(saldo, extrato)
-        
+        exibir_extrato(saldo, extrato)
+    
     elif opcao == "0":
         print("Muito obrigado por utilizar nossos serviços!")
 
