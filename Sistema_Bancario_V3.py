@@ -8,6 +8,9 @@ menu = """
 [1] Depositar
 [2] Sacar
 [3] Extrato
+[4] Nova Conta
+[5] Novo Usuário
+[6] Listar Contas
 [0] Sair
 
 
@@ -22,8 +25,10 @@ LIMITE_SAQUES = 3
 numero_transacoes = 0
 LIMITE_TRANSACOES = 10
 data_ultimo_reset = datetime.now(timezone.utc).date()
+conta = []
+usuarios = []
 
-def obter_data_formatada():
+def data_hora():
     """Obtém a data e hora atual formatada."""
     return datetime.now(timezone.utc).strftime("%A, %d. %B %Y %I:%M%p")
 
@@ -41,7 +46,7 @@ def reset_limites_diarios (numero_saques, numero_transacoes, data_ultimo_reset):
 
     return data_ultimo_reset, numero_saques, numero_transacoes
 
-def realizar_deposito(saldo, extrato, numero_transacoes):
+def depositar(saldo, extrato, numero_transacoes, /):
     '''Realiza um depósito na conta, adicionando o valor ao saldo e registrando a transação no extrato.
        Atualiza o número de transações realizadas no dia.'''
     try:
@@ -54,7 +59,7 @@ def realizar_deposito(saldo, extrato, numero_transacoes):
         
         elif valor > 0:
             saldo += valor
-            data_transacao = obter_data_formatada()
+            data_transacao = data_hora()
             extrato.append(f"Deposito: R$ {valor:.2f}       {data_transacao}\n")
             numero_transacoes += 1
             print(f"Depósito de R$ {valor:.2f} realizado com sucesso.\n")    
@@ -65,7 +70,7 @@ def realizar_deposito(saldo, extrato, numero_transacoes):
 
     return saldo, extrato, numero_transacoes
 
-def realizar_saque(saldo, extrato, numero_saques, numero_transacoes):
+def sacar(*, saldo, extrato, numero_saques, numero_transacoes):
  #'''Realiza um saque na conta, removendo o valor ao saldo e registrando a transação no extrato.
  #   Atualiza o número de transações realizadas no dia.
  #   Limita o número de saques diários a 3'''
@@ -87,7 +92,7 @@ def realizar_saque(saldo, extrato, numero_saques, numero_transacoes):
             print("Operação falhou! Você excedeu o numero de transações diárias.")
         elif valor>0:
             saldo -= valor
-            data_transacao = obter_data_formatada()
+            data_transacao = data_hora()
             extrato.append(f"Saque: R$ {valor:.2f}      {data_transacao}\n")
             numero_saques += 1
             numero_transacoes += 1
@@ -100,7 +105,7 @@ def realizar_saque(saldo, extrato, numero_saques, numero_transacoes):
 
     return saldo, extrato, numero_saques, numero_transacoes
 
-def exibir_extrato (saldo, extrato, obter_data_formatada):
+def exibir_extrato (saldo, extrato, data_hora):
     '''Exibe o extrato e todas as movimentações realizadas com data e hora de cada uma.'''
     print("\n===============EXTRATO===============")
     if not extrato:
@@ -110,17 +115,22 @@ def exibir_extrato (saldo, extrato, obter_data_formatada):
             print(linha)
     print(f"\nSaldo: R$ {saldo:.2f}")
     print("=======================================")
-    print(obter_data_formatada)
+    print(data_hora)
 
 def processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset):
     """Processa a opção escolhida pelo usuário."""
     continuar = True  # Define o valor padrão como True
     if opcao == "1":
-        saldo, extrato, numero_transacoes = realizar_deposito(saldo, extrato, numero_transacoes)
+        saldo, extrato, numero_transacoes = depositar(saldo, extrato, numero_transacoes)
     elif opcao == "2":
-        saldo, extrato, numero_saques, numero_transacoes = realizar_saque(saldo, extrato, numero_saques, numero_transacoes)
+        saldo, extrato,numero_saques, numero_transacoes = sacar(
+            saldo=saldo,
+            extrato=extrato,
+            numero_saques=numero_saques,
+            numero_transacoes=numero_transacoes
+            )
     elif opcao == "3":
-        exibir_extrato(saldo, extrato, obter_data_formatada())
+        exibir_extrato(saldo, extrato, data_hora())
     elif opcao == "0":
         print("Muito obrigado por utilizar nossos serviços!")
         continuar = False  # Define para False ao sair
