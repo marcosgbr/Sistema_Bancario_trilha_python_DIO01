@@ -1,22 +1,5 @@
 from datetime import datetime, timezone
 
-menu = """
-=====================================
-    Selecione a opção desejada:
-
-
-[1] Depositar
-[2] Sacar
-[3] Extrato
-[4] Nova Conta
-[5] Novo Usuário
-[6] Listar Contas
-[0] Sair
-
-
-=====================================
-"""
-
 saldo = 0
 valor_limite_saque = 500
 extrato = []
@@ -27,6 +10,7 @@ LIMITE_TRANSACOES = 10
 data_ultimo_reset = datetime.now(timezone.utc).date()
 conta = []
 usuarios = []
+usuario = []
 
 def data_hora():
     """Obtém a data e hora atual formatada."""
@@ -34,10 +18,26 @@ def data_hora():
 
 def exibir_menu():
     """Exibe o menu de opções."""
+    menu = """
+    =====================================
+        Selecione a opção desejada:
+
+
+    [1] Depositar
+    [2] Sacar
+    [3] Extrato
+    [4] Novo Usuário
+    [5] Nova Conta
+    [0] Sair
+
+
+    =====================================
+"""
+
     print(menu)
 
 def reset_limites_diarios (numero_saques, numero_transacoes, data_ultimo_reset):
- #      '''Verifica se o dia mudou para resetar os contadores limites.'''
+#      '''Verifica se o dia mudou para resetar os contadores limites.'''
     hoje = datetime.now(timezone.utc).date()
     if hoje != data_ultimo_reset:
         numero_saques = 0
@@ -48,7 +48,7 @@ def reset_limites_diarios (numero_saques, numero_transacoes, data_ultimo_reset):
 
 def depositar(saldo, extrato, numero_transacoes, /):
     '''Realiza um depósito na conta, adicionando o valor ao saldo e registrando a transação no extrato.
-       Atualiza o número de transações realizadas no dia.'''
+    Atualiza o número de transações realizadas no dia.'''
     try:
         valor = float(input("Informe o valor do depósito: "))
 
@@ -71,9 +71,9 @@ def depositar(saldo, extrato, numero_transacoes, /):
     return saldo, extrato, numero_transacoes
 
 def sacar(*, saldo, extrato, numero_saques, numero_transacoes):
- #'''Realiza um saque na conta, removendo o valor ao saldo e registrando a transação no extrato.
- #   Atualiza o número de transações realizadas no dia.
- #   Limita o número de saques diários a 3'''
+#'''Realiza um saque na conta, removendo o valor ao saldo e registrando a transação no extrato.
+#   Atualiza o número de transações realizadas no dia.
+#   Limita o número de saques diários a 3'''
     try:
         valor = float(input("Informe o valor do saque: "))
         
@@ -117,6 +117,39 @@ def exibir_extrato (saldo, extrato, data_hora):
     print("=======================================")
     print(data_hora)
 
+def criar_usuario(usuarios):
+    '''Cria um novo usuário e adiciona a lista de usuários.'''
+    nome = input("Informe o nome do usuário: ")
+    cpf = input("Informe o CPF do usuário: ")
+    usuario = {"nome": nome, "cpf": cpf, "contas": []}
+    usuarios.append(usuario)
+    print("Usuário criado com sucesso!")
+    return usuario, usuarios
+
+def criar_conta(conta, usuarios):
+    '''Cria uma nova conta e adiciona a lista de contas de um usuário específico.'''
+    nome = input("Informe o nome do titular da conta: ")
+    cpf = input("Informe o CPF do titular da conta: ")
+    
+    # Procura o usuário pelo CPF
+    usuario = None
+    for u in usuarios:
+        if u[1] == cpf:  # Comparando o CPF
+            usuario = u
+            break
+    
+    if usuario is None:
+        print("Usuário não encontrado. Crie o usuário antes de criar a conta.")
+        return conta, usuarios
+    
+    conta = [nome, cpf]  # Cria a conta
+    if "contas" not in usuario:
+        usuario.append({"contas": []})  # Se não houver uma lista de contas no usuário, cria uma
+    usuario["contas"].append(conta)  # Adiciona a conta ao usuário
+    
+    print("Conta criada com sucesso!")
+    return conta, usuarios
+
 def processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset):
     """Processa a opção escolhida pelo usuário."""
     continuar = True  # Define o valor padrão como True
@@ -131,6 +164,13 @@ def processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, dat
             )
     elif opcao == "3":
         exibir_extrato(saldo, extrato, data_hora())
+    
+    elif opcao == "4":
+        usuario, usuarios = criar_usuario(usuarios)
+    
+    elif opcao == "5":
+        conta, usuarios = criar_conta(conta, usuarios)
+    
     elif opcao == "0":
         print("Muito obrigado por utilizar nossos serviços!")
         continuar = False  # Define para False ao sair
