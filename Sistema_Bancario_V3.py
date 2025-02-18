@@ -117,7 +117,7 @@ def exibir_extrato (saldo, extrato, data_hora):
     print("=======================================")
     print(data_hora)
 
-def criar_usuario(usuarios):
+def criar_usuario(usuarios, usuario):
     '''Cria um novo usuário e adiciona a lista de usuários.'''
     nome = input("Informe o nome do usuário: ")
     cpf = input("Informe o CPF do usuário: ")
@@ -134,7 +134,7 @@ def criar_conta(conta, usuarios):
     # Procura o usuário pelo CPF
     usuario = None
     for u in usuarios:
-        if u[1] == cpf:  # Comparando o CPF
+        if u['cpf'] == cpf:  # Comparando o CPF
             usuario = u
             break
     
@@ -150,7 +150,7 @@ def criar_conta(conta, usuarios):
     print("Conta criada com sucesso!")
     return conta, usuarios
 
-def processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset):
+def processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset, conta, usuario, usuarios):
     """Processa a opção escolhida pelo usuário."""
     continuar = True  # Define o valor padrão como True
     if opcao == "1":
@@ -166,7 +166,7 @@ def processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, dat
         exibir_extrato(saldo, extrato, data_hora())
     
     elif opcao == "4":
-        usuario, usuarios = criar_usuario(usuarios)
+        usuario, usuarios = criar_usuario(usuarios, usuario)
     
     elif opcao == "5":
         conta, usuarios = criar_conta(conta, usuarios)
@@ -177,7 +177,7 @@ def processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, dat
     else:
         print("Opção inválida! Por favor, selecione uma opção válida.")
 
-    return saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset, continuar
+    return saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset, conta, usuario, usuarios, continuar
 
 while True:
 #   '''Loop principal, onde o menu é exibido e há a interação com o usuário.'''
@@ -185,7 +185,7 @@ while True:
     exibir_menu()
     opcao = input("Escolha uma opção: ")
 
-    saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset, continuar = processar_opcao( opcao, saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset)
+    saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset, conta, usuario, usuarios, continuar = processar_opcao(opcao, saldo, extrato, numero_saques, numero_transacoes, data_ultimo_reset, conta, usuario, usuarios)
 
     if not continuar:
         break
